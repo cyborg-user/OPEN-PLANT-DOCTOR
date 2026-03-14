@@ -57,4 +57,4 @@ def main():
     print("\nWeather Forecast:")
     print(result["weather_analysis"])
 if __name__ == "__main__":
-    main()
+    main() 
