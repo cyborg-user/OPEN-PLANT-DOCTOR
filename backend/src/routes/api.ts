@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { fetchLiveNews } from '../services/news';
 import { fetchLiveMarketData } from '../services/market';
+import { generateCountryPrediction } from '../services/ai';
+import { fetchLiveFlights } from '../services/flightService';
+import { fetchLiveConflicts } from '../services/conflictService';
 
 const router = Router();
 
@@ -24,6 +27,44 @@ router.get('/market', async (req, res) => {
     marketCache.lastFetch = now;
   }
   res.json(marketCache.data);
+});
+
+router.get('/flights', async (req, res) => {
+  try {
+    const flights = await fetchLiveFlights();
+    res.json(flights);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch flight data' });
+  }
+});
+
+router.get('/conflicts', async (req, res) => {
+  try {
+    const conflicts = await fetchLiveConflicts();
+    res.json(conflicts);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch conflict data' });
+  }
+});
+
+router.post('/custom-ai', async (req, res) => {
+  const { processCustomModelInference } = await import('../services/customMarketAI');
+  const result = await processCustomModelInference(req.body);
+  if (result.success) {
+    res.json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
+router.get('/ai/:countryCode', async (req, res) => {
+  const { countryCode } = req.params;
+  try {
+    const prediction = await generateCountryPrediction(countryCode.toUpperCase());
+    res.json(prediction);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to generate prediction' });
+  }
 });
 
 export default router;

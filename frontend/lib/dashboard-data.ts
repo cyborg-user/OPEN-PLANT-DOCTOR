@@ -45,7 +45,9 @@ export interface FilterState {
   satellites: boolean
 }
 
-export const countries: Country[] = [
+import { extraCountries } from './extra-countries';
+
+const baseCountries: Country[] = [
   {
     name: 'Ukraine', code: 'UA', flag: '\u{1F1FA}\u{1F1E6}', lat: 48.3794, lng: 31.1656,
     riskLevel: 'critical', riskScore: 94,
@@ -286,6 +288,8 @@ export const countries: Country[] = [
     population: '18.1M', region: 'East Africa'
   },
 ]
+
+export const countries: Country[] = [...baseCountries, ...extraCountries];
 
 export const globalEvents: GlobalEvent[] = [
   {

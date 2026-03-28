@@ -7,6 +7,8 @@ import DashboardHeader from '@/components/dashboard/header'
 import LeftSidebar from '@/components/dashboard/left-sidebar'
 import CountryPanel from '@/components/dashboard/country-panel'
 import EventTimeline from '@/components/dashboard/event-timeline'
+import ConflictTracker from '@/components/dashboard/conflict-tracker'
+import CustomAIWorkspace from '@/components/dashboard/custom-ai-workspace'
 import IntroOverlay from '@/components/dashboard/intro-overlay'
 import type { Country, FilterState } from '@/lib/dashboard-data'
 
@@ -25,6 +27,7 @@ const WorldMap = dynamic(() => import('@/components/dashboard/world-map'), {
 export default function GeoPulseDashboard() {
   const [showIntro, setShowIntro] = useState(true)
   const [dashboardReady, setDashboardReady] = useState(false)
+  const [showCustomAI, setShowCustomAI] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
   const [filters, setFilters] = useState<FilterState>({
     earthquakes: true,
@@ -64,7 +67,7 @@ export default function GeoPulseDashboard() {
         transition={{ duration: 1.2, ease: 'easeOut' }}
       >
         {/* Top Header */}
-        <DashboardHeader />
+        <DashboardHeader onOpenCustomAI={() => setShowCustomAI(true)} />
 
         {/* Main Content Area */}
         <div className="flex-1 flex min-h-0">
@@ -80,11 +83,18 @@ export default function GeoPulseDashboard() {
 
           {/* Right Sidebar: Country Intel */}
           <CountryPanel country={selectedCountry} onClose={handleClosePanel} />
+
+          {/* Floating Conflict Tracker (Bottom Left) */}
+          <ConflictTracker />
         </div>
 
         {/* Bottom: Event Timeline */}
         <EventTimeline />
       </motion.div>
+
+      <AnimatePresence>
+        {showCustomAI && <CustomAIWorkspace onClose={() => setShowCustomAI(false)} />}
+      </AnimatePresence>
     </>
   )
 }

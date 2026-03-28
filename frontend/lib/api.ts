@@ -23,3 +23,36 @@ export async function fetchLiveMarket() {
     return null;
   }
 }
+
+export async function fetchAIPrediction(countryCode: string) {
+  try {
+    const res = await fetch(`${API_BASE}/ai/${countryCode}`);
+    if (!res.ok) throw new Error('Failed to fetch AI prediction');
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+export async function fetchLiveFlights() {
+  try {
+    const res = await fetch(`${API_BASE}/flights`);
+    if (!res.ok) throw new Error('Failed to fetch flights');
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+export async function fetchLiveConflicts() {
+  try {
+    const res = await fetch(`${API_BASE}/conflicts`);
+    if (!res.ok) throw new Error('Failed to fetch conflicts');
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}

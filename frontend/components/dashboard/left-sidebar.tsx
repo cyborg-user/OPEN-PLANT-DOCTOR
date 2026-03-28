@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Flame,
   CloudLightning,
@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { globalStats } from '@/lib/dashboard-data'
 import type { FilterState } from '@/lib/dashboard-data'
+import { fetchLiveMarket } from '@/lib/api'
 
 interface LeftSidebarProps {
   filters: FilterState
@@ -25,6 +26,17 @@ interface LeftSidebarProps {
 
 export default function LeftSidebar({ filters, onFiltersChange }: LeftSidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
+  const [marketData, setMarketData] = useState<any>(null)
+
+  useEffect(() => {
+    const getMarket = async () => {
+      const data = await fetchLiveMarket();
+      if (data) setMarketData(data);
+    };
+    getMarket();
+    const interval = setInterval(getMarket, 60000); // refresh every 1 min
+    return () => clearInterval(interval);
+  }, []);
 
   const filterItems = [
     { key: 'earthquakes' as const, label: 'SEISMIC', icon: Activity, color: '#FFC107', count: 24 },
@@ -41,11 +53,11 @@ export default function LeftSidebar({ filters, onFiltersChange }: LeftSidebarPro
   }
 
   return (
-    <aside className={`${collapsed ? 'w-12' : 'w-60'} shrink-0 bg-sentinel-surface border-r border-border flex flex-col transition-all duration-300 overflow-hidden`}>
+    <aside className={`${collapsed ? 'w-12' : 'w-60'} shrink-0 bg-[var(--bg-secondary)] border-r border-[var(--surface-border)] flex flex-col transition-all duration-300 overflow-hidden`}>
       {/* Sidebar Header */}
-      <div className="h-10 flex items-center justify-between px-3 border-b border-border shrink-0">
+      <div className="h-10 flex items-center justify-between px-3 border-b border-[var(--surface-border)] shrink-0">
         {!collapsed && (
-          <span className="text-[10px] font-mono text-sentinel-cyan tracking-[0.2em]">DATA LAYERS</span>
+          <span className="text-[10px] font-display font-semibold text-[var(--text-muted)] tracking-[0.15em]">DATA LAYERS</span>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -69,17 +81,17 @@ export default function LeftSidebar({ filters, onFiltersChange }: LeftSidebarPro
                   onClick={() => toggleFilter(item.key as keyof FilterState)}
                   className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded text-left transition-all duration-200 ${
                     isActive
-                      ? 'bg-sentinel-surface-2 text-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-sentinel-surface-2/50'
+                      ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: isActive ? item.color : undefined }} />
-                  <span className="text-[11px] font-mono tracking-wider flex-1">{item.label}</span>
+                  <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: isActive ? 'var(--blue-bright)' : 'currentColor' }} />
+                  <span className="text-[13px] font-medium tracking-wider flex-1 text-[var(--text-primary)]">{item.label}</span>
                   <span
-                    className="text-[9px] font-mono px-1.5 py-0.5 rounded"
+                    className="text-[10px] font-bold px-1.5 py-0.5 rounded"
                     style={{
-                      background: isActive ? `${item.color}15` : undefined,
-                      color: isActive ? item.color : undefined,
+                      background: isActive ? item.key === 'flights' ? 'var(--blue-accent)' : item.color : 'transparent',
+                      color: isActive ? '#FFFFFF' : undefined,
                     }}
                   >
                     {item.count >= 1000 ? `${(item.count / 1000).toFixed(1)}K` : item.count}
@@ -90,11 +102,11 @@ export default function LeftSidebar({ filters, onFiltersChange }: LeftSidebarPro
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-border" />
+          <div className="h-px bg-[var(--surface-border)]" />
 
           {/* Global Statistics */}
           <div className="flex flex-col gap-2">
-            <span className="text-[10px] font-mono text-sentinel-cyan tracking-[0.2em] mb-1">GLOBAL STATS</span>
+            <span className="text-[10px] font-display font-semibold text-[var(--text-muted)] tracking-[0.15em] mb-1">GLOBAL STATS</span>
 
             <StatRow
               icon={<AlertTriangle className="w-3.5 h-3.5 text-sentinel-red" />}
@@ -124,42 +136,52 @@ export default function LeftSidebar({ filters, onFiltersChange }: LeftSidebarPro
               icon={<Zap className="w-3.5 h-3.5 text-sentinel-green" />}
               label="SAT FEEDS"
               value={globalStats.satelliteFeeds.toString()}
-              color="#00FF88"
+              color="var(--status-low)"
             />
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-border" />
+          <div className="h-px bg-[var(--surface-border)]" />
 
           {/* Market Tickers */}
           <div className="flex flex-col gap-2">
-            <span className="text-[10px] font-mono text-sentinel-cyan tracking-[0.2em] mb-1">MARKET DATA</span>
+            <span className="text-[10px] font-display font-semibold text-[var(--text-muted)] tracking-[0.15em] mb-1">MARKET DATA</span>
 
-            <div className="bg-sentinel-surface-2/50 rounded p-2.5 border border-border">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-mono text-muted-foreground">GOLD / USD</span>
-                <span className={`text-[9px] font-mono ${globalStats.goldChange > 0 ? 'text-sentinel-green' : 'text-sentinel-red'}`}>
-                  {globalStats.goldChange > 0 ? '+' : ''}{globalStats.goldChange}%
-                </span>
-              </div>
-              <div className="text-sm font-mono text-sentinel-gold font-semibold">
-                ${globalStats.goldPrice.toFixed(2)}
-              </div>
-              <MiniSparkline data={[2820, 2835, 2828, 2842, 2838, 2845, 2851]} color="#FFD700" />
-            </div>
-
-            <div className="bg-sentinel-surface-2/50 rounded p-2.5 border border-border">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-mono text-muted-foreground">BRENT / USD</span>
-                <span className={`text-[9px] font-mono ${globalStats.oilChange > 0 ? 'text-sentinel-green' : 'text-sentinel-red'}`}>
-                  {globalStats.oilChange > 0 ? '+' : ''}{globalStats.oilChange}%
-                </span>
-              </div>
-              <div className="text-sm font-mono text-sentinel-cyan font-semibold">
-                ${globalStats.oilPrice.toFixed(2)}
-              </div>
-              <MiniSparkline data={[84, 83, 85, 82, 84, 83, 82.65]} color="#00E5FF" />
-            </div>
+            {marketData ? (
+              <>
+                <div className="bg-[var(--bg-elevated)] rounded p-2.5 border border-[var(--surface-border)] hover:border-[var(--blue-accent)] transition-colors">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-mono text-[var(--text-muted)]">GOLD (XAU/USD)</span>
+                    <span className={`text-[9px] font-mono ${marketData.goldChange >= 0 ? 'text-[var(--status-low)]' : 'text-[var(--status-critical)]'}`}>
+                      {marketData.goldChange >= 0 ? '+' : ''}{marketData.goldChange.toFixed(2)}%
+                    </span>
+                  </div>
+                  <div className="text-sm font-mono text-sentinel-gold font-semibold">
+                    ${marketData.goldPriceUSD.toFixed(2)}
+                  </div>
+                  <MiniSparkline data={[2820, 2835, 2828, 2842, 2838, 2845, marketData.goldPriceUSD]} color="var(--status-medium)" />
+                </div>
+                
+                {Object.entries(marketData.stocks).map(([name, data]: [string, any]) => (
+                  <div key={name} className="bg-[var(--bg-elevated)] rounded p-2.5 border border-[var(--surface-border)] hover:border-[var(--blue-accent)] transition-colors">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] font-mono text-[var(--text-muted)]">{name}</span>
+                      <span className={`text-[9px] font-mono ${data.change >= 0 ? 'text-[var(--status-low)]' : 'text-[var(--status-critical)]'}`}>
+                        {data.change >= 0 ? '+' : ''}{data.change.toFixed(2)}%
+                      </span>
+                    </div>
+                    <div className="text-sm font-mono text-[var(--blue-bright)] font-semibold">
+                      ${data.price.toFixed(2)}
+                    </div>
+                    {data.history && data.history.length > 0 && (
+                      <MiniSparkline data={data.history} color={data.change >= 0 ? "var(--status-low)" : "var(--status-critical)"} />
+                    )}
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className="text-[10px] font-mono text-[var(--text-muted)] animate-pulse">CONNECTING TO EXCHANGES...</div>
+            )}
           </div>
 
           {/* Threat Level Gauge */}

@@ -92,26 +92,26 @@ export default function EventTimeline() {
   }
 
   return (
-    <div className="h-36 shrink-0 bg-sentinel-surface border-t border-border flex flex-col relative overflow-hidden">
+    <div className="h-36 shrink-0 bg-[var(--bg-primary)] border-t border-[var(--surface-border)] flex flex-col relative overflow-hidden">
       {/* Timeline Header */}
-      <div className="h-8 flex items-center justify-between px-4 border-b border-border shrink-0 z-20 bg-sentinel-surface/80 backdrop-blur-sm">
+      <div className="h-8 flex items-center justify-between px-4 border-b border-[var(--surface-border)] shrink-0 z-20 bg-[var(--bg-secondary)] backdrop-blur-sm">
         <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-sentinel-cyan animate-pulse-dot" />
-          <span className="text-[10px] font-mono text-sentinel-cyan tracking-[0.2em]">LIVE NEWS FEED</span>
-          <span className="text-[9px] font-mono text-muted-foreground ml-2">{events.length} UPDATES</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--blue-bright)] animate-pulse-dot" />
+          <span className="text-[10px] font-display font-semibold text-[var(--blue-bright)] tracking-[0.2em]">LIVE NEWS FEED</span>
+          <span className="text-[9px] font-mono text-[var(--text-muted)] ml-2">{events.length} UPDATES</span>
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={() => scroll('left')}
             disabled={!canScrollLeft}
-            className="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-sentinel-cyan disabled:opacity-30 transition-colors"
+            className="w-6 h-6 flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--blue-bright)] disabled:opacity-30 transition-colors"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => scroll('right')}
             disabled={!canScrollRight}
-            className="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-sentinel-cyan disabled:opacity-30 transition-colors"
+            className="w-6 h-6 flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--blue-bright)] disabled:opacity-30 transition-colors"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
@@ -140,10 +140,10 @@ export default function EventTimeline() {
       </div>
 
       {canScrollLeft && (
-        <div className="absolute left-0 top-8 bottom-0 w-8 bg-gradient-to-r from-sentinel-surface to-transparent pointer-events-none z-20" />
+        <div className="absolute left-0 top-8 bottom-0 w-8 bg-gradient-to-r from-[var(--bg-primary)] to-transparent pointer-events-none z-20" />
       )}
       {canScrollRight && (
-        <div className="absolute right-0 top-8 bottom-0 w-8 bg-gradient-to-l from-sentinel-surface to-transparent pointer-events-none z-20" />
+        <div className="absolute right-0 top-8 bottom-0 w-8 bg-gradient-to-l from-[var(--bg-primary)] to-transparent pointer-events-none z-20" />
       )}
     </div>
   )
@@ -160,7 +160,7 @@ function EventCard({ event, icon, timeAgo, index }: any) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.05 }}
-      className="relative shrink-0 w-64 flex flex-col gap-1.5 p-2.5 rounded bg-sentinel-surface-2/60 border border-border hover:border-sentinel-cyan/30 transition-colors duration-200 group"
+      className="relative shrink-0 w-64 flex flex-col gap-1.5 p-2.5 rounded bg-[var(--bg-elevated)] border border-[var(--surface-border)] hover:border-[var(--blue-accent)] transition-colors duration-200 group"
       onClick={() => event.link && window.open(event.link, '_blank')}
       style={{ cursor: event.link ? 'pointer' : 'default' }}
     >
@@ -182,13 +182,13 @@ function EventCard({ event, icon, timeAgo, index }: any) {
         </span>
       </div>
 
-      <p className="text-[11px] font-mono text-foreground leading-tight line-clamp-2 group-hover:text-sentinel-cyan transition-colors">
+      <p className="text-[12px] font-sans text-[var(--text-primary)] leading-tight line-clamp-2 group-hover:text-[var(--blue-bright)] transition-colors">
         {event.title}
       </p>
 
       <div className="flex items-center justify-between mt-auto pt-2">
-        <span className="text-[9px] font-mono text-muted-foreground truncate max-w-[120px]">{event.location}</span>
-        <span className="text-[9px] font-mono text-sentinel-cyan/80 font-bold">{timeAgo}</span>
+        <span className="text-[10px] font-mono text-[var(--text-muted)] truncate max-w-[120px]">{event.location}</span>
+        <span className="text-[10px] font-mono text-[var(--blue-bright)] font-bold">{timeAgo}</span>
       </div>
 
       <div
